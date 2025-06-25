@@ -1,11 +1,13 @@
 require('dotenv').config();
 const TelegramBot = require('node-telegram-bot-api');
 const https = require('https');
-const { checkInterval } = require('./config');
 
 // Initialize Telegram bot
 const bot = new TelegramBot(process.env.TELEGRAM_BOT_TOKEN);
 const chatIds = process.env.TELEGRAM_CHAT_IDS.split(',');
+
+const checkInterval = 5 * 60 * 1000; // 5 minutes in milliseconds
+// const checkInterval = 60 * 1000; // 1 minutes in milliseconds
 
 // Watchdog endpoints to monitor
 const endpoints = [

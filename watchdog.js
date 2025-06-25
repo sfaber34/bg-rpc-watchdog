@@ -1,7 +1,7 @@
 require('dotenv').config();
 const TelegramBot = require('node-telegram-bot-api');
 const https = require('https');
-const { checkInterval, rpcProxyPort, rpcPoolPort } = require('./config');
+const { checkInterval, rpcProxyPort, rpcPoolPort, rpcWebServerPort } = require('./config');
 
 // Initialize Telegram bot
 const bot = new TelegramBot(process.env.TELEGRAM_BOT_TOKEN);
@@ -10,16 +10,25 @@ const chatIds = process.env.TELEGRAM_CHAT_IDS.split(',');
 // Watchdog endpoints to monitor
 const endpoints = [
   {
-    name: 'RPC Pool Service',
-    url: `https://${process.env.RPC_HOST}:${rpcPoolPort}/watchdog`,
+    name: 'stage.mainnet.rpc.buidlguidl.com (pre-proxy)',
+    url: `https://stage.mainnet.rpc.buidlguidl.com/watchdog`,
     timeout: 10000 // 10 seconds
   },
   {
     name: 'RPC Proxy Service',
     url: `https://${process.env.RPC_HOST}:${rpcProxyPort}/watchdog`,
     timeout: 10000 // 10 seconds
-  }
-  // Add more endpoints here as needed
+  },
+  {
+    name: 'RPC Pool Service',
+    url: `https://${process.env.RPC_HOST}:${rpcPoolPort}/watchdog`,
+    timeout: 10000 // 10 seconds
+  },
+  {
+    name: 'RPC Web Server Service',
+    url: `https://${process.env.RPC_HOST}:${rpcWebServerPort}/watchdog`,
+    timeout: 10000 // 10 seconds
+  },
 ];
 
 // Store last known status to avoid spam

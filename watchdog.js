@@ -1,7 +1,7 @@
 require('dotenv').config();
 const TelegramBot = require('node-telegram-bot-api');
 const https = require('https');
-const { checkInterval, rpcPoolPort } = require('./config');
+const { checkInterval, rpcProxyPort, rpcPoolPort } = require('./config');
 
 // Initialize Telegram bot
 const bot = new TelegramBot(process.env.TELEGRAM_BOT_TOKEN);
@@ -12,6 +12,11 @@ const endpoints = [
   {
     name: 'RPC Pool Service',
     url: `https://${process.env.RPC_HOST}:${rpcPoolPort}/watchdog`,
+    timeout: 10000 // 10 seconds
+  },
+  {
+    name: 'RPC Proxy Service',
+    url: `https://${process.env.RPC_HOST}:${rpcProxyPort}/watchdog`,
     timeout: 10000 // 10 seconds
   }
   // Add more endpoints here as needed
@@ -90,7 +95,7 @@ async function monitorEndpoint(endpoint) {
     
     // If it was down before and now it's up, send recovery alert
     if (lastKnownStatus === false) {
-      const message = `🟢 RECOVERY: ${endpoint.name} is back online!\nURL: ${endpoint.url}`;
+      const message = `\n------------------------------------------\n🟢 RECOVERY: ${endpoint.name} is back online!\nURL: ${endpoint.url}`;
       await sendTelegramAlert(message);
     }
   } else {
@@ -98,7 +103,7 @@ async function monitorEndpoint(endpoint) {
     
     // If it was up before and now it's down, send alert
     if (lastKnownStatus !== false) {
-      const message = `🔴 ALERT: ${endpoint.name} is down!\nURL: ${endpoint.url}\nError: ${result.error}\nTime: ${new Date().toISOString()}`;
+      const message = `\n------------------------------------------\n🔴 ALERT: ${endpoint.name} is down!\nURL: ${endpoint.url}\nError: ${result.error}\nTime: ${new Date().toISOString()}`;
       await sendTelegramAlert(message);
     }
   }
